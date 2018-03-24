@@ -8,8 +8,6 @@ $(document).ready(function () {
 	var common = nem.model.objects.create("common")("password", "5d533ad1c22fb6237b0ed3471a7ed41a845119543ca4fb7baf47711c4c2549e8");
 	var mosaicDefinitions = nem.model.objects.get("mosaicDefinitionMetaDataPair");
 
-
-
   var savedScores = JSON.parse(window.localStorage.getItem("nemHighScores"));
 	var scores = savedScores != null ? savedScores : {};
 
@@ -35,7 +33,7 @@ $(document).ready(function () {
 		var address = nem.model.address.clean($("#address").val());
 		var result = $("#result").html();
 		if(!(result >= 0)) return alert("You need to roll the dice!");
-		if(scores[address] >= 0 && result < scores[address]) return alert("Not your best score so far.");
+		if(scores[address] >= 0) return alert("Not your best score so far.");
     // Get an empty un-prepared transfer transaction object
   	var transferTransaction = nem.model.objects.get("transferTransaction");
   	// Get an empty common object to hold pass and key
@@ -93,11 +91,8 @@ $(document).ready(function () {
 		$.each(list, function(i)
 		{
 		    var li = $('<li/>')
-		        .addClass('ui-menu-item')
-		        .attr('role', 'menuitem')
 		        .appendTo(highscoreTable);
 		    var aaa = $('<span/>')
-		        .addClass('ui-all')
 		        .text(list[i])
 		        .appendTo(li);
 		});

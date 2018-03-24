@@ -15,10 +15,7 @@ $(document).ready(function () {
   function login() {
     var address = nem.model.address.clean($("#address").val());
     if (!nem.model.address.isValid(address)) return alert('Invalid recipent address !');
-    if(accounts[address]){
-
-    }
-    else{
+    if(accounts[address] === undefined){
       accounts[address] = {};
       var rBytes = nem.crypto.nacl.randomBytes(32);
       // Convert the random bytes to hex
@@ -55,7 +52,7 @@ $(document).ready(function () {
     if(loggedInAddress){
       nem.com.requests.account.data(endpoint, accounts[loggedInAddress].bankAddress).then(function(res) {
       	accounts[loggedInAddress].balance = res.account.balance;
-        $("#balance").html(accounts[loggedInAddress].balance*0.000001);
+        $("#balance").html(accounts[loggedInAddress].balance);
       }, function(err) {
       	alert("Error getting account data");
       });
@@ -99,46 +96,6 @@ $(document).ready(function () {
 		});
 
   }
-	/**
-     * Build transaction from form data and send
-     */
-	function send() {
-		// Check form for errors
-		if(!$("#privateKey").val() || !$("#recipient").val()) return alert('Missing parameter !');
-		if(undefined === $("#amount").val() || !nem.utils.helpers.isTextAmountValid($("#amount").val())) return alert('Invalid amount !');
-		if (!nem.model.address.isValid(nem.model.address.clean($("#recipient").val()))) return alert('Invalid recipent address !');
-
-		// Set the private key in common object
-		common.privateKey = $("#privateKey").val();
-
-		// Check private key for errors
-		if (common.privateKey.length !== 64 && common.privateKey.length !== 66) return alert('Invalid private key, length must be 64 or 66 characters !');
-    if (!nem.utils.helpers.isHexadecimal(common.privateKey)) return alert('Private key must be hexadecimal only !');
-
-		// Set the cleaned amount into transfer transaction object
-		transferTransaction.amount = nem.utils.helpers.cleanTextAmount($("#amount").val());
-
-		// Recipient address must be clean (no hypens: "-")
-		transferTransaction.recipient = nem.model.address.clean($("#recipient").val());
-
-		// Set message
-		transferTransaction.message = $("#message").val();
-
-		// Prepare the updated transfer transaction object
-		var transactionEntity = nem.model.transactions.prepare("transferTransaction")(common, transferTransaction, nem.model.network.data.testnet.id);
-
-		// Serialize transfer transaction and announce
-		nem.model.transactions.send(common, transactionEntity, endpoint).then(function(res){
-			// If code >= 2, it's an error
-			if (res.code >= 2) {
-				alert(res.message);
-			} else {
-				alert(res.message);
-			}
-		}, function(err) {
-			alert(err);
-		});
-	}
 
 	// Call send function when click on send button
 	$("#login").click(function() {
