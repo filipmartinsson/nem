@@ -12,6 +12,12 @@ $(document).ready(function () {
 	var accounts = savedAccounts != null ? savedAccounts : {};
   var loggedInAddress = "";
 
+
+
+
+
+
+
   function login() {
     var address = nem.model.address.clean($("#address").val());
     if (!nem.model.address.isValid(address)) return alert('Invalid recipent address !');
@@ -48,6 +54,12 @@ $(document).ready(function () {
     $("#dashboard").show();
   }
 
+
+
+
+
+
+
   function refreshBalance(){
     if(loggedInAddress){
       nem.com.requests.account.data(endpoint, accounts[loggedInAddress].bankAddress).then(function(res) {
@@ -58,6 +70,11 @@ $(document).ready(function () {
       });
     }
   }
+
+
+
+
+
 
   function withdraw() {
     if($("#withdrawAmount").val() === undefined || !nem.utils.helpers.isTextAmountValid($("#withdrawAmount").val())) return alert('Invalid amount !');
