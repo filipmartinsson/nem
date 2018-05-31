@@ -9,6 +9,9 @@ $(document).ready(function () {
 	var mosaicDefinitions = nem.model.objects.get("mosaicDefinitionMetaDataPair");
 
   function roll() {
+		var random = Math.floor(Math.random()*1000001);
+		console.log(random);
+		$("#result").html(random);
   }
 
   function save() {

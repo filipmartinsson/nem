@@ -8,41 +8,32 @@ $(document).ready(function () {
 	var common = nem.model.objects.create("common")("password", "5d533ad1c22fb6237b0ed3471a7ed41a845119543ca4fb7baf47711c4c2549e8");
 	var mosaicDefinitions = nem.model.objects.get("mosaicDefinitionMetaDataPair");
 
-  var savedScores = JSON.parse(window.localStorage.getItem("nemHighScores"));
-	var scores = savedScores != null ? savedScores : {};
+	var savedScores = JSON.parse(window.localStorage.getItem("random-game-score"));
+	var scores;
+
+	if(savedScores !== null){
+		scores = savedScores;
+	}
+	else{
+		scores = {};
+	}
 
   function roll() {
-		var random = Math.floor(Math.random() * 1000001);
+		var random = Math.floor(Math.random()*1000001);
 		console.log(random);
-    $("#result").html(random);
-  }
-
-  function refreshBalance(){
-    if(loggedInAddress){
-      nem.com.requests.account.data(endpoint, accounts[loggedInAddress].bankAddress).then(function(res) {
-      	accounts[loggedInAddress].balance = res.account.balance;
-        $("#balance").html(accounts[loggedInAddress].balance*0.000001);
-      }, function(err) {
-      	alert("Error getting account data");
-      });
-    }
+		$("#result").html(random);
   }
 
   function save() {
-
 		var address = nem.model.address.clean($("#address").val());
 		var result = $("#result").html();
 		if(!(result >= 0)) return alert("You need to roll the dice!");
 		if(scores[address] >= 0) return alert("Not your best score so far.");
-    // Get an empty un-prepared transfer transaction object
-  	var transferTransaction = nem.model.objects.get("transferTransaction");
-  	// Get an empty common object to hold pass and key
 
-    // Set the cleaned amount into transfer transaction object
+  	var transferTransaction = nem.model.objects.get("transferTransaction");
+
 		transferTransaction.amount = 0;
 
-		console.log($("#address").val());
-		// Recipient address must be clean (no hypens: "-")
 		transferTransaction.recipient = address;
 
     transferTransaction.message = "Random game";
@@ -61,57 +52,49 @@ $(document).ready(function () {
 		  preparedTransaction.fee = 500000;
 
 		  nem.model.transactions.send(common, preparedTransaction, endpoint).then(function(res){
-		    console.log(res);
 				if (res.code >= 2) {
-				alert(res.message);
-			} else {
-				scores[address] = $("#result").html();
-				window.localStorage.setItem("nemHighScores", JSON.stringify(scores));
-				updateScoringTable();
-			}
-		  }, function(err){
-		    console.log(err);
-		  });
+					alert(res.message);
+				} else {
+					scores[address] = $("#result").html();
+					window.localStorage.setItem("random-game-score", JSON.stringify(scores));
+					updateScoringTable();
+				}
+			  }, function(err){
+			    console.log(err);
+			  });
 
 		}, function(err){
 		  console.log(err);
 		});
-
   }
 
 	function updateScoringTable(){
-		let list = [];
+		var list = [];
 		for (var key in scores) {
-	    if (scores.hasOwnProperty(key)) {
-	        list.push(key + ': ' + scores[key]);
-	    }
+			if (scores.hasOwnProperty(key)) {
+					list.push(key + ': ' + scores[key]);
+			}
 		}
 		var highscoreTable = $('#highscoreTable')
 		highscoreTable.html('');
 		$.each(list, function(i)
 		{
-		    var li = $('<li/>')
-		        .appendTo(highscoreTable);
-		    var aaa = $('<span/>')
-		        .text(list[i])
-		        .appendTo(li);
+				var li = $('<li/>')
+						.appendTo(highscoreTable);
+				var aaa = $('<span/>')
+						.text(list[i])
+						.appendTo(li);
 		});
-}
+	}
 
 
 	updateScoringTable();
-	// Call send function when click on send button
+
 	$("#roll").click(function() {
 	  roll();
 	});
   $("#save").click(function() {
 	  save();
 	});
-  $("#withdraw").click(function() {
-    withdraw();
-  });
-
-
-
 
 });
